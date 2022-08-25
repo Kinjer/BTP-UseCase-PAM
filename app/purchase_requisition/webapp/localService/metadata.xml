@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1" />
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1" />
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1" />
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="PamService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="PurchaseRequisitionItems" EntityType="PamService.PurchaseRequisitionItems">
+                    <NavigationPropertyBinding Path="SiblingEntity" Target="PurchaseRequisitionItems" />
+                </EntitySet>
+            </EntityContainer>
+            <EntityType Name="PurchaseRequisitionItems">
+                <Key>
+                    <PropertyRef Name="ID" />
+                    <PropertyRef Name="IsActiveEntity" />
+                </Key>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7" />
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255" />
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7" />
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255" />
+                <Property Name="ID" Type="Edm.Guid" Nullable="false" />
+                <Property Name="PurchaseRequisition" Type="Edm.String" MaxLength="10" />
+                <Property Name="PurchaseRequisitionItem" Type="Edm.String" MaxLength="5" />
+                <Property Name="PurchasingDocument" Type="Edm.String" MaxLength="10" />
+                <Property Name="PurchasingDocumentItem" Type="Edm.String" MaxLength="5" />
+                <Property Name="PurReqnReleaseStatus" Type="Edm.String" MaxLength="2" />
+                <Property Name="PurchaseRequisitionType" Type="Edm.String" MaxLength="4" />
+                <Property Name="PurchasingDocumentSubtype" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurchasingDocumentItemCategory" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurchaseRequisitionItemText" Type="Edm.String" MaxLength="40" />
+                <Property Name="AccountAssignmentCategory" Type="Edm.String" MaxLength="1" />
+                <Property Name="Material" Type="Edm.String" MaxLength="40" />
+                <Property Name="MaterialGroup" Type="Edm.String" MaxLength="9" />
+                <Property Name="PurchasingDocumentCategory" Type="Edm.String" MaxLength="1" />
+                <Property Name="RequestedQuantity" Type="Edm.String" />
+                <Property Name="BaseUnit" Type="Edm.String" MaxLength="3" />
+                <Property Name="PurchaseRequisitionPrice" Type="Edm.String" />
+                <Property Name="PurReqnPriceQuantity" Type="Edm.String" />
+                <Property Name="MaterialGoodsReceiptDuration" Type="Edm.String" />
+                <Property Name="ReleaseCode" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurchaseRequisitionReleaseDate" Type="Edm.String" />
+                <Property Name="PurchasingOrganization" Type="Edm.String" MaxLength="4" />
+                <Property Name="PurchasingGroup" Type="Edm.String" MaxLength="3" />
+                <Property Name="Plant" Type="Edm.String" MaxLength="4" />
+                <Property Name="CompanyCode" Type="Edm.String" MaxLength="4" />
+                <Property Name="SourceOfSupplyIsAssigned" Type="Edm.Boolean" />
+                <Property Name="SupplyingPlant" Type="Edm.String" MaxLength="4" />
+                <Property Name="OrderedQuantity" Type="Edm.String" />
+                <Property Name="DeliveryDate" Type="Edm.String" />
+                <Property Name="CreationDate" Type="Edm.String" />
+                <Property Name="ProcessingStatus" Type="Edm.String" MaxLength="1" />
+                <Property Name="ExternalApprovalStatus" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurchasingInfoRecord" Type="Edm.String" MaxLength="10" />
+                <Property Name="Supplier" Type="Edm.String" MaxLength="10" />
+                <Property Name="IsDeleted" Type="Edm.String" MaxLength="1" />
+                <Property Name="FixedSupplier" Type="Edm.String" MaxLength="10" />
+                <Property Name="RequisitionerName" Type="Edm.String" MaxLength="12" />
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="12" />
+                <Property Name="PurReqCreationDate" Type="Edm.String" />
+                <Property Name="DeliveryAddressID" Type="Edm.String" MaxLength="10" />
+                <Property Name="ManualDeliveryAddressID" Type="Edm.String" MaxLength="10" />
+                <Property Name="PurReqnItemCurrency" Type="Edm.String" MaxLength="5" />
+                <Property Name="MaterialPlannedDeliveryDurn" Type="Edm.String" />
+                <Property Name="DelivDateCategory" Type="Edm.String" MaxLength="1" />
+                <Property Name="MultipleAcctAssgmtDistribution" Type="Edm.String" MaxLength="1" />
+                <Property Name="StorageLocation" Type="Edm.String" MaxLength="4" />
+                <Property Name="PurReqnSSPRequestor" Type="Edm.String" MaxLength="60" />
+                <Property Name="PurReqnSSPAuthor" Type="Edm.String" MaxLength="12" />
+                <Property Name="PurchaseContract" Type="Edm.String" MaxLength="10" />
+                <Property Name="PurReqnSourceOfSupplyType" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurchaseContractItem" Type="Edm.String" MaxLength="5" />
+                <Property Name="ConsumptionPosting" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurReqnOrigin" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurReqnSSPCatalog" Type="Edm.String" MaxLength="20" />
+                <Property Name="PurReqnSSPCatalogItem" Type="Edm.String" MaxLength="40" />
+                <Property Name="PurReqnSSPCrossCatalogItem" Type="Edm.Int32" />
+                <Property Name="IsPurReqnBlocked" Type="Edm.String" MaxLength="1" />
+                <Property Name="ItemDeliveryAddressID" Type="Edm.String" MaxLength="10" />
+                <Property Name="Language" Type="Edm.String" MaxLength="2" />
+                <Property Name="IsClosed" Type="Edm.Boolean" />
+                <Property Name="ReleaseIsNotCompleted" Type="Edm.Boolean" />
+                <Property Name="ServicePerformer" Type="Edm.String" MaxLength="10" />
+                <Property Name="ProductType" Type="Edm.String" MaxLength="2" />
+                <Property Name="PurchaseRequisitionStatus" Type="Edm.String" MaxLength="8" />
+                <Property Name="ReleaseStrategy" Type="Edm.String" MaxLength="2" />
+                <Property Name="PerformancePeriodStartDate" Type="Edm.String" />
+                <Property Name="PerformancePeriodEndDate" Type="Edm.String" />
+                <Property Name="PurchaseOrderPriceType" Type="Edm.String" MaxLength="1" />
+                <Property Name="SupplierMaterialNumber" Type="Edm.String" MaxLength="35" />
+                <Property Name="Batch" Type="Edm.String" MaxLength="10" />
+                <Property Name="MaterialRevisionLevel" Type="Edm.String" MaxLength="2" />
+                <Property Name="MinRemainingShelfLife" Type="Edm.String" />
+                <Property Name="ItemNetAmount" Type="Edm.String" />
+                <Property Name="GoodsReceiptIsExpected" Type="Edm.Boolean" />
+                <Property Name="InvoiceIsExpected" Type="Edm.Boolean" />
+                <Property Name="GoodsReceiptIsNonValuated" Type="Edm.Boolean" />
+                <Property Name="RequirementTracking" Type="Edm.String" MaxLength="10" />
+                <Property Name="MRPController" Type="Edm.String" MaxLength="3" />
+                <Property Name="TaxCode" Type="Edm.String" MaxLength="2" />
+                <Property Name="PurchaseRequisitionIsFixed" Type="Edm.Boolean" />
+                <Property Name="AddressID" Type="Edm.String" MaxLength="10" />
+                <Property Name="LastChangeDateTime" Type="Edm.String" />
+                <Property Name="Reservation" Type="Edm.String" MaxLength="10" />
+                <Property Name="ExpectedOverallLimitAmount" Type="Edm.String" />
+                <Property Name="OverallLimitAmount" Type="Edm.String" />
+                <Property Name="PurContractForOverallLimit" Type="Edm.String" MaxLength="10" />
+                <Property Name="PurReqnExternalReference" Type="Edm.String" MaxLength="35" />
+                <Property Name="PurReqnItemExternalReference" Type="Edm.String" MaxLength="10" />
+                <Property Name="PurReqnExternalSystemId" Type="Edm.String" MaxLength="60" />
+                <Property Name="PurReqnExternalSystemType" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurReqnTypeExternalReference" Type="Edm.String" MaxLength="4" />
+                <Property Name="PurReqnProcessingType" Type="Edm.String" MaxLength="1" />
+                <Property Name="PurReqnProcessingDateTime" Type="Edm.String" MaxLength="14" />
+                <Property Name="ProcmtHubBackendBusSyst" Type="Edm.String" MaxLength="60" />
+                <Property Name="SSPAuthorExternalBPIdnNumber" Type="Edm.String" MaxLength="60" />
+                <Property Name="SSPReqrUserId" Type="Edm.String" MaxLength="12" />
+                <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="true" />
+                <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false" />
+                <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false" />
+                <NavigationProperty Name="DraftAdministrativeData" Type="PamService.DraftAdministrativeData" ContainsTarget="true" />
+                <NavigationProperty Name="SiblingEntity" Type="PamService.PurchaseRequisitionItems" />
+            </EntityType>
+            <EntityType Name="DraftAdministrativeData">
+                <Key>
+                    <PropertyRef Name="DraftUUID" />
+                </Key>
+                <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false" />
+                <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7" />
+                <Property Name="CreatedByUser" Type="Edm.String" MaxLength="256" />
+                <Property Name="DraftIsCreatedByMe" Type="Edm.Boolean" />
+                <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7" />
+                <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="256" />
+                <Property Name="InProcessByUser" Type="Edm.String" MaxLength="256" />
+                <Property Name="DraftIsProcessedByMe" Type="Edm.Boolean" />
+            </EntityType>
+            <Action Name="draftPrepare" IsBound="true" EntitySetPath="in">
+                <Parameter Name="in" Type="PamService.PurchaseRequisitionItems" />
+                <Parameter Name="SideEffectsQualifier" Type="Edm.String" />
+                <ReturnType Type="PamService.PurchaseRequisitionItems" />
+            </Action>
+            <Action Name="draftActivate" IsBound="true" EntitySetPath="in">
+                <Parameter Name="in" Type="PamService.PurchaseRequisitionItems" />
+                <ReturnType Type="PamService.PurchaseRequisitionItems" />
+            </Action>
+            <Action Name="draftEdit" IsBound="true" EntitySetPath="in">
+                <Parameter Name="in" Type="PamService.PurchaseRequisitionItems" />
+                <Parameter Name="PreserveChanges" Type="Edm.Boolean" />
+                <ReturnType Type="PamService.PurchaseRequisitionItems" />
+            </Action>
+            <Annotations Target="PamService.EntityContainer/PurchaseRequisitionItems">
+                <Annotation Term="Common.DraftRoot">
+                    <Record Type="Common.DraftRootType">
+                        <PropertyValue Property="ActivationAction" String="PamService.draftActivate" />
+                        <PropertyValue Property="EditAction" String="PamService.draftEdit" />
+                        <PropertyValue Property="PreparationAction" String="PamService.draftPrepare" />
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true" />
+                <Annotation Term="Core.Immutable" Bool="true" />
+                <Annotation Term="Core.Computed" Bool="true" />
+                <Annotation Term="Common.Label" String="{i18n>CreatedAt}" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true" />
+                <Annotation Term="Core.Immutable" Bool="true" />
+                <Annotation Term="Core.Computed" Bool="true" />
+                <Annotation Term="Core.Description" String="{i18n>UserID.Description}" />
+                <Annotation Term="Common.Label" String="{i18n>CreatedBy}" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true" />
+                <Annotation Term="Core.Computed" Bool="true" />
+                <Annotation Term="Common.Label" String="{i18n>ChangedAt}" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true" />
+                <Annotation Term="Core.Computed" Bool="true" />
+                <Annotation Term="Core.Description" String="{i18n>UserID.Description}" />
+                <Annotation Term="Common.Label" String="{i18n>ChangedBy}" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/ID">
+                <Annotation Term="Core.Computed" Bool="true" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/IsActiveEntity">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/HasActiveEntity">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/HasDraftEntity">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            <Annotations Target="PamService.PurchaseRequisitionItems/DraftAdministrativeData">
+                <Annotation Term="UI.Hidden" Bool="true" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData">
+                <Annotation Term="Common.Label" String="{i18n>Draft_DraftAdministrativeData}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/DraftUUID">
+                <Annotation Term="UI.Hidden" Bool="true" />
+                <Annotation Term="Common.Label" String="{i18n>Draft_DraftUUID}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/CreationDateTime">
+                <Annotation Term="Common.Label" String="{i18n>Draft_CreationDateTime}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/CreatedByUser">
+                <Annotation Term="Common.Label" String="{i18n>Draft_CreatedByUser}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/DraftIsCreatedByMe">
+                <Annotation Term="UI.Hidden" Bool="true" />
+                <Annotation Term="Common.Label" String="{i18n>Draft_DraftIsCreatedByMe}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/LastChangeDateTime">
+                <Annotation Term="Common.Label" String="{i18n>Draft_LastChangeDateTime}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/LastChangedByUser">
+                <Annotation Term="Common.Label" String="{i18n>Draft_LastChangedByUser}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/InProcessByUser">
+                <Annotation Term="Common.Label" String="{i18n>Draft_InProcessByUser}" />
+            </Annotations>
+            <Annotations Target="PamService.DraftAdministrativeData/DraftIsProcessedByMe">
+                <Annotation Term="UI.Hidden" Bool="true" />
+                <Annotation Term="Common.Label" String="{i18n>Draft_DraftIsProcessedByMe}" />
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

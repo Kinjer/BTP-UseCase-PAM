@@ -1,0 +1,5 @@
+select * from procurementapprovalmanagement_PurchaseRequisitionItems;
+
+delete from procurementapprovalmanagement_PurchaseRequisitionItems where PurchaseRequisition='10000010';
+
+delete from procurementapprovalmanagement_PurchaseRequisitionItems where PurchaseRequisition <> '70000000';

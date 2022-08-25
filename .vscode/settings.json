@@ -5,5 +5,12 @@
     "**/.git": true,
     "**/.vscode": true,
     "**/.npmrc": true
-  }
+},
+"sqltools.connections": [
+    {
+        "dialect": "SQLite",
+        "database": "/home/user/projects/procurement-approval-management/db/my-pamdb.db",
+        "name": "pamdb"
+    }
+]
 }

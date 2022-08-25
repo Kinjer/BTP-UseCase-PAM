@@ -1,8 +1,8 @@
 {
-  "name": "risk-management",
+  "name": "procurement-approval-management",
   "version": "1.0.0",
   "description": "Template for the the SAP Extension Suite Learning Journey",
-  "author": "m.haug@sap.com",
+  "author": "jingzhe.ye@kpmg.com",
   "license": "SAP SAMPLE CODE LICENSE",
   "repository": "https://github.com/SAP-samples/sap-learning-extension-suite",
   "engines": {
@@ -12,13 +12,35 @@
   "dependencies": {
     "@sap/cds": "5.1.5",
     "@sap/cds-dk": "4.1.5",
-    "express": "^4"
+    "express": "^4",
+    "node-schedule": "^2.1.0"
   },
   "devDependencies": {
-    "@sap/ux-specification": "^1.96.2",
-    "sqlite3": "^5.0.2"
+    "@sap/ux-specification": "^1.102.2",
+    "sqlite3": "^5.0.11"
   },
   "scripts": {
-    "start": "cds run"
+    "start": "cds run",
+    "watch-purchase_requisition": "cds watch --open purchase_requisition/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "sapux": [
+    "app/purchase_requisition"
+  ],
+  "cds": {
+    "requires": {
+      "API_PURCHASEREQ_PROCESS_SRV": {
+        "kind": "odata",
+        "model": "srv/external/API_PURCHASEREQ_PROCESS_SRV",
+        "credentials": {
+          "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_PURCHASEREQ_PROCESS_SRV"
+        }
+      },
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": "db/my-pamdb.db"
+        }
+      }
+    }
   }
 }
