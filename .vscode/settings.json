@@ -9,7 +9,7 @@
 "sqltools.connections": [
     {
         "dialect": "SQLite",
-        "database": "/home/user/projects/procurement-approval-management/db/my-pamdb.db",
+        "database": "/home/user/projects/btp-pam/BTP-UseCase-PAM/db/my-pamdb.db",
         "name": "pamdb"
     }
 ]
