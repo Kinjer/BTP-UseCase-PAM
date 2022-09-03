@@ -2,6 +2,7 @@
 const cds = require("@sap/cds");
 const schedule = require("node-schedule");
 const https = require('https');
+const date = require('silly-datetime');
 
 /**
  * The service implementation with all service handlers
@@ -59,7 +60,6 @@ module.exports = cds.service.impl(async function () {
         // getMails();
         // sendMail();
         // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
-        getPurchaseRequisition();
 
     });
 
@@ -82,6 +82,7 @@ module.exports = cds.service.impl(async function () {
             console.log("---------------------");
 
             insertRemoteServiceData(index);
+            sendMail();
 
             if (index == 3) {
                 job.cancel();
@@ -106,20 +107,51 @@ module.exports = cds.service.impl(async function () {
         }
     }
 
-    async function getPurchaseRequisition() {
+    async function getMailContent() {
         var query = SELECT.from(PurchaseRequisitionItems).columns('PurchaseRequisition', 'PurchasingDocument', 'PurchaseRequisitionItemText', 'Material', 'RequestedQuantity', 'PurchaseRequisitionPrice', 'CompanyCode', 'Supplier', 'CreationDate', 'DeliveryDate').where("ReleaseCode='' or ReleaseCode='A'").orderBy("PurchaseRequisition");
 
         var prs = await cds.run(query);
 
+        var html = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><title></title></head><body><div id=\"prsdiv\" style=\"font-size:11pt\">";
+
         if (prs) {
             prs.forEach(function (element) {
-                console.log(element);
-                var purchaseRequisition = element.PurchaseRequisition;
-                console.log(purchaseRequisition);
+                html = html + formatPurchaseRequisitionStr(element);
             });
 
         }
 
+        html = html + "</div></body></html>";
+        return html;
+
+    }
+
+    async function formatPurchaseRequisitionStr(item) {
+        
+        var purchaseRequisition = item.PurchaseRequisition;
+        var purchasingDocument = item.PurchasingDocument;
+        var text = item.PurchaseRequisitionItemText;
+        var material = item.Material;
+        var requestedQuantity = item.RequestedQuantity;
+        var price = item.PurchaseRequisitionPrice;
+        var companyCode = item.CompanyCode;
+        var supplier = item.Supplier;
+        var creationDate = item.CreationDate;
+        var deliveryDate = item.DeliveryDate;
+
+        var result = "<div>Purchase Requisition Id:<span name=\"prId\">"+purchaseRequisition
+        +"</span></div><div>Purchase Order Id:<span>"+purchasingDocument
+        +"</span></div><div>Short Text:<span>"+text
+        +"</span></div><div>Material:<span>"+material
+        +"</span></div><div>Quantity requested:<span>"+requestedQuantity
+        +"</span></div><div>Valuation Price:<span>"+price
+        +"</span></div><div>Company Code:<span>"+companyCode
+        +"</span></div><div>Desired Supplier:<span>"+supplier
+        +"</span></div><div>Requisition Date:<span>"+creationDate
+        +"</span></div><div>Delivery Date:<span>"+deliveryDate
+        +"</span></div><div>--------------------------------------------------------------</div>";
+        
+        return result;
     }
 
     async function getMails() {
@@ -151,11 +183,12 @@ module.exports = cds.service.impl(async function () {
     }
 
     async function sendMail() {
+        var currentDate = date.format(new Date(), 'YYYYMMDD');
 
         var post_data = {
             "Body": {
-                "Content": "20220831test700000001abc",
-                "ContentType": "TEXT"
+                "Content": getMailContent(),
+                "ContentType": "HTML"
             },
             "From": {
                 "EmailAddress": {
@@ -174,7 +207,7 @@ module.exports = cds.service.impl(async function () {
                     "Name": "PAM Service"
                 }
             },
-            "Subject": "Purchase approval application20220831",
+            "Subject": "Purchase approval application "+currentDate,
             "ToRecipients": [
                 {
                     "EmailAddress": {
