@@ -3,6 +3,7 @@ const cds = require("@sap/cds");
 const schedule = require("node-schedule");
 const https = require('https');
 const date = require('silly-datetime');
+const JSDOM = require('jsdom').JSDOM;
 
 /**
  * The service implementation with all service handlers
@@ -57,10 +58,11 @@ module.exports = cds.service.impl(async function () {
     // });
 
     this.on("READ", PurchaseRequisitionItems, async (req) => {
-        // getMails();
+        getMails();
         // sendMail();
         // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
 
+        // updatePurchaseRequisitionItems('10000011', 'B');
     });
 
     function scheduleJob() {
@@ -112,7 +114,7 @@ module.exports = cds.service.impl(async function () {
 
         var prs = await cds.run(query);
 
-        var html = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><title></title></head><body><div id=\"prsdiv\" style=\"font-size:11pt\">";
+        var html = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><title></title></head><body><div id=\"prsdiv\" style=\"font-size:11pt\"><div>Please approve the following purchase requisitions. You can reply to the approval result directly in the email according to the example. If you want to approve all, please reply [approve all] directly. If you want to reject all, please reply [reject all] directly. If you want to approve each purchase requisition separately, please reply in this format (Purchase Requisition Id-result). For example: 10000011-approve, 10000012-reject</div><div>--------------------------------------------------------------</div>";
 
         if (prs) {
             prs.forEach(function (element) {
@@ -126,8 +128,8 @@ module.exports = cds.service.impl(async function () {
 
     }
 
-    async function formatPurchaseRequisitionStr(item) {
-        
+    function formatPurchaseRequisitionStr(item) {
+
         var purchaseRequisition = item.PurchaseRequisition;
         var purchasingDocument = item.PurchasingDocument;
         var text = item.PurchaseRequisitionItemText;
@@ -139,22 +141,22 @@ module.exports = cds.service.impl(async function () {
         var creationDate = item.CreationDate;
         var deliveryDate = item.DeliveryDate;
 
-        var result = "<div>Purchase Requisition Id:<span name=\"prId\">"+purchaseRequisition
-        +"</span></div><div>Purchase Order Id:<span>"+purchasingDocument
-        +"</span></div><div>Short Text:<span>"+text
-        +"</span></div><div>Material:<span>"+material
-        +"</span></div><div>Quantity requested:<span>"+requestedQuantity
-        +"</span></div><div>Valuation Price:<span>"+price
-        +"</span></div><div>Company Code:<span>"+companyCode
-        +"</span></div><div>Desired Supplier:<span>"+supplier
-        +"</span></div><div>Requisition Date:<span>"+creationDate
-        +"</span></div><div>Delivery Date:<span>"+deliveryDate
-        +"</span></div><div>--------------------------------------------------------------</div>";
-        
+        var result = "<div>Purchase Requisition Id:<span name=\"prId\">" + purchaseRequisition
+            + "</span></div><div>Purchase Order Id:<span>" + purchasingDocument
+            + "</span></div><div>Short Text:<span>" + text
+            + "</span></div><div>Material:<span>" + material
+            + "</span></div><div>Quantity requested:<span>" + requestedQuantity
+            + "</span></div><div>Valuation Price:<span>" + price
+            + "</span></div><div>Company Code:<span>" + companyCode
+            + "</span></div><div>Desired Supplier:<span>" + supplier
+            + "</span></div><div>Requisition Date:<span>" + creationDate
+            + "</span></div><div>Delivery Date:<span>" + deliveryDate
+            + "</span></div><div>--------------------------------------------------------------</div>";
+
         return result;
     }
 
-    async function getMails() {
+    function getMails() {
         const options = {
             hostname: 'api.openconnectors.trial.us10.ext.hana.ondemand.com',
             port: 443,
@@ -172,7 +174,8 @@ module.exports = cds.service.impl(async function () {
             // console.log('GET-->headers:', res.headers);
 
             res.on('data', (d) => {
-                process.stdout.write(d);
+                // process.stdout.write(d);
+                getApproveResultByEachMail(d);
             });
         });
 
@@ -182,7 +185,83 @@ module.exports = cds.service.impl(async function () {
         req.end();
     }
 
-    async function sendMail() {
+    function getApproveResultByEachMail(data) {
+
+        var jsonObject = JSON.parse(data);
+        jsonObject.forEach(function (element) {
+            var mailPreContent = element.BodyPreview;
+            var mailContent = element.Body.Content;
+            var mailId = element.Id;
+
+            var prIdList = parseHtml(mailContent);
+            approveResultByPrId(mailPreContent, prIdList);
+            // update mail IsRead = true by mailId
+
+        });
+
+    }
+
+    function approveResultByPrId(str, prIdList) {
+        var strIndex = str.indexOf("\r\n");
+        str = str.substring(0, strIndex);
+        console.log(str);
+        str = str.replace(" ", "").replace("，", ",");
+        var strList = str.split(",");
+
+        prIdList.forEach(function (prId) {
+
+            if (str === "approveall") {
+                console.log("update all B");
+            } else if (str === "rejectall") {
+                console.log("update all C");
+            } else {
+                strList.forEach(function (item) {
+                    var index = item.indexOf(prId);
+                    var result = "";
+                    if (index != -1) {
+                        result = item.replace(prId + "-", "");
+                        console.log(result);
+                        if (result === "approve") {
+                            console.log(prId + "update B");
+                        }
+                        if (result === "reject") {
+                            console.log(prId + "update C");
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    function parseHtml(html) {
+        // Get Document Object
+        var dom = new JSDOM(html).window.document;
+
+        // Find the corresponding object through the document operation 
+        var nodeList = dom.getElementsByName("prId");
+
+        var prIdList = [];
+        nodeList.forEach(function (element) {
+
+            var prId = element.textContent;
+            console.log(prId);
+            prIdList.push(prId);
+        });
+
+        return prIdList;
+
+    }
+
+    async function updatePurchaseRequisitionItems(prId, releaseCode) {
+        console.log("update" + prId + ":" + releaseCode);
+
+        await cds.run(UPDATE(PurchaseRequisitionItems).set('ReleaseCode=', releaseCode).where('PurchaseRequisition=', prId));
+
+    }
+
+
+    function sendMail() {
         var currentDate = date.format(new Date(), 'YYYYMMDD');
 
         var post_data = {
@@ -207,7 +286,7 @@ module.exports = cds.service.impl(async function () {
                     "Name": "PAM Service"
                 }
             },
-            "Subject": "Purchase approval application "+currentDate,
+            "Subject": "Purchase approval application " + currentDate,
             "ToRecipients": [
                 {
                     "EmailAddress": {
@@ -252,7 +331,7 @@ module.exports = cds.service.impl(async function () {
         req.end();
     }
 
-    async function updateMail(mailId) {
+    function updateMail(mailId) {
 
         var patch_data = {
             "IsRead": true

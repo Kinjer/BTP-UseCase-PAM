@@ -13,7 +13,9 @@
     "@sap/cds": "5.1.5",
     "@sap/cds-dk": "4.1.5",
     "express": "^4",
-    "node-schedule": "^2.1.0"
+    "jsdom": "^20.0.0",
+    "node-schedule": "^2.1.0",
+    "silly-datetime": "^0.1.2"
   },
   "devDependencies": {
     "@sap/ux-specification": "^1.102.2",
