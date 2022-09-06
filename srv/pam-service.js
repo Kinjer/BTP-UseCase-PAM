@@ -30,16 +30,17 @@ module.exports = cds.service.impl(async function () {
         return prs;
     });
 
-    this.on("READ", PurchaseRequisitionItems, async (req) => {
-        getMails();
-        // sendMail();
-        // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
+    // this.on("READ", PurchaseRequisitionItems, async (req) => {
+    //     // getMails();
+    //     // sendMail();
+    //     // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
 
-        // updatePurchaseRequisitionItems('10000011', 'B');
-    });
+    //     // updatePurchaseRequisitionItems('10000011', 'B');
+    //     // updateRemoteServiceData('10000011', '10', 'B');
+    // });
 
-    // scheduleJobGetPr();
-    // scheduleJobUpdatePr();
+    scheduleJobGetPr();
+    scheduleJobUpdatePr();
 
     function scheduleJobGetPr() {
 
@@ -48,7 +49,7 @@ module.exports = cds.service.impl(async function () {
         // rule.date = [1];
         // rule.dayOfWeek = [1, 3, 5];
         // rule.hour = [0, 12]; 
-        rule.minute = [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25, 30, 33, 35, 37, 40, 43, 45, 46, 47, 48, 49, 50, 55];
+        rule.minute = [1, 5, 7, 9, 11, 13, 15, 20, 22, 24, 30, 35, 40, 45, 47, 49, 50, 55];
         // rule.second = 0;
 
         var index = 0;
@@ -77,7 +78,7 @@ module.exports = cds.service.impl(async function () {
         // rule.date = [1];
         // rule.dayOfWeek = [1, 3, 5];
         // rule.hour = [0, 12]; 
-        rule.minute = [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25, 30, 33, 35, 37, 40, 43, 45, 46, 47, 48, 49, 50, 55];
+        rule.minute = [0, 3, 6, 10, 12, 14, 21, 23, 25, 31, 33, 37, 41, 43, 46, 48, 51, 54];
         // rule.second = 0;
 
         var index = 0;
@@ -113,12 +114,21 @@ module.exports = cds.service.impl(async function () {
     }
 
     async function updateRemoteServiceData(prId, prItem, releaseCode) {
-        var prs = await BPsrv.send({
-            query: UPDATE `PurchaseRequisitions` .set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId} and PurchaseRequisitionItem=${prItem}`,
-            headers: {
-                apikey: process.env.apikey,
-            },
-        });
+        try {
+            
+            var result = await BPsrv.send({
+                query: UPDATE(PurchaseRequisitions).set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId} and PurchaseRequisitionItem=${prItem}`,
+                headers: {
+                    apikey: process.env.apikey,
+                },
+            });
+
+        } catch (error) {
+            console.log("error message ==> " + error);
+            console.log(error.code);
+            // console.log("=======================================");
+            // console.log(error);
+        }
 
     }
 
@@ -281,6 +291,8 @@ module.exports = cds.service.impl(async function () {
         console.log("update" + prId + ":" + releaseCode);
 
         await cds.run(UPDATE(PurchaseRequisitionItems).set('ReleaseCode=', releaseCode).where('PurchaseRequisition=', prId));
+
+        updateRemoteServiceData(prId, getPrItem(prId), releaseCode);
 
     }
 
