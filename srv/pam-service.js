@@ -307,8 +307,8 @@ module.exports = cds.service.impl(async function () {
             },
             "From": {
                 "EmailAddress": {
-                    "Address": "btppam@outlook.com",
-                    "Name": "PAM Service"
+                    "Address": process.env.fromAddress,
+                    "Name": process.env.fromName
                 }
             },
             "Importance": "High",
@@ -318,16 +318,16 @@ module.exports = cds.service.impl(async function () {
             "IsReadReceiptRequested": false,
             "Sender": {
                 "EmailAddress": {
-                    "Address": "btppam@outlook.com",
-                    "Name": "PAM Service"
+                    "Address": process.env.fromAddress,
+                    "Name": process.env.fromName
                 }
             },
             "Subject": "Purchase approval application " + currentDate,
             "ToRecipients": [
                 {
                     "EmailAddress": {
-                        "Address": "jingzhe.ye@outlook.com",
-                        "Name": "Jingzhe Ye"
+                        "Address": process.env.toAddress,
+                        "Name": process.env.toName
                     }
                 }
             ]
