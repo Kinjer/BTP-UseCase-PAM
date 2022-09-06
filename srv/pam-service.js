@@ -21,13 +21,6 @@ module.exports = cds.service.impl(async function () {
      */
     this.on("READ", PurchaseRequisitions, async (req) => {
 
-        // const prs = await BPsrv.transaction(req).send({
-        //     query: SELECT.from(this.entities.PurchaseRequisitions).where("PurchaseRequisition='10000010'").orderBy("PurchaseRequisition"),
-        //     headers: {
-        //         apikey: process.env.apikey,
-        //     },
-        // });
-
         const prs = await BPsrv.send({
             query: SELECT.from(this.entities.PurchaseRequisitions).where("PurchaseRequisition='10000010'").orderBy("PurchaseRequisition"),
             headers: {
@@ -37,26 +30,6 @@ module.exports = cds.service.impl(async function () {
         return prs;
     });
 
-    // this.before("READ", PurchaseRequisitionItems, async (req) => {
-
-    //     const prs = await BPsrv.send({
-    //         query: SELECT.from(this.entities.PurchaseRequisitions).orderBy("PurchaseRequisition").limit(1, 10),
-    //         headers: {
-    //             apikey: process.env.apikey,
-    //         },
-    //     });
-
-    //     // console.log("-----------------res start----------------");
-    //     // console.log(prs);
-    //     // console.log("-----------------res end----------------");
-
-    //     // const tx = cds.tx(req);
-    //     await cds.run(INSERT.into(PurchaseRequisitionItems, prs));
-
-    //     // srv.run(INSERT.into(PurchaseRequisitionItems, prs));
-
-    // });
-
     this.on("READ", PurchaseRequisitionItems, async (req) => {
         getMails();
         // sendMail();
@@ -65,7 +38,10 @@ module.exports = cds.service.impl(async function () {
         // updatePurchaseRequisitionItems('10000011', 'B');
     });
 
-    function scheduleJob() {
+    // scheduleJobGetPr();
+    // scheduleJobUpdatePr();
+
+    function scheduleJobGetPr() {
 
         // 定义规则
         let rule = new schedule.RecurrenceRule();
@@ -94,7 +70,34 @@ module.exports = cds.service.impl(async function () {
 
     }
 
-    // scheduleJob();
+    function scheduleJobUpdatePr() {
+
+        // 定义规则
+        let rule = new schedule.RecurrenceRule();
+        // rule.date = [1];
+        // rule.dayOfWeek = [1, 3, 5];
+        // rule.hour = [0, 12]; 
+        rule.minute = [0, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 25, 30, 33, 35, 37, 40, 43, 45, 46, 47, 48, 49, 50, 55];
+        // rule.second = 0;
+
+        var index = 0;
+        // start job
+        let job = schedule.scheduleJob(rule, () => {
+            index = index + 1;
+            console.log("---------------------" + index);
+            console.log(new Date());
+            console.log("---------------------");
+
+            getMails();
+
+            if (index == 3) {
+                job.cancel();
+            }
+        });
+
+
+    }
+
 
     async function insertRemoteServiceData(index) {
         var prs = await BPsrv.send({
@@ -107,6 +110,16 @@ module.exports = cds.service.impl(async function () {
         if (prs) {
             await cds.run(INSERT.into(PurchaseRequisitionItems, prs));
         }
+    }
+
+    async function updateRemoteServiceData(prId, prItem, releaseCode) {
+        var prs = await BPsrv.send({
+            query: UPDATE `PurchaseRequisitions` .set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId} and PurchaseRequisitionItem=${prItem}`,
+            headers: {
+                apikey: process.env.apikey,
+            },
+        });
+
     }
 
     async function getMailContent() {
@@ -196,6 +209,7 @@ module.exports = cds.service.impl(async function () {
             var prIdList = parseHtml(mailContent);
             approveResultByPrId(mailPreContent, prIdList);
             // update mail IsRead = true by mailId
+            updateMail(mailId);
 
         });
 
@@ -211,9 +225,11 @@ module.exports = cds.service.impl(async function () {
         prIdList.forEach(function (prId) {
 
             if (str === "approveall") {
-                console.log("update all B");
+                updatePurchaseRequisitionItems(prId, "B");
+                console.log(prId + "update all B");
             } else if (str === "rejectall") {
-                console.log("update all C");
+                updatePurchaseRequisitionItems(prId, "C");
+                console.log(prId + "update all C");
             } else {
                 strList.forEach(function (item) {
                     var index = item.indexOf(prId);
@@ -222,9 +238,11 @@ module.exports = cds.service.impl(async function () {
                         result = item.replace(prId + "-", "");
                         console.log(result);
                         if (result === "approve") {
+                            updatePurchaseRequisitionItems(prId, "B");
                             console.log(prId + "update B");
                         }
                         if (result === "reject") {
+                            updatePurchaseRequisitionItems(prId, "C");
                             console.log(prId + "update C");
                         }
                     }
@@ -251,6 +269,12 @@ module.exports = cds.service.impl(async function () {
 
         return prIdList;
 
+    }
+
+    async function getPrItem(prId) {
+        var query = SELECT.from(PurchaseRequisitionItems).columns('PurchaseRequisitionItem').where("PurchaseRequisition=", prId);
+
+        return await cds.run(query);
     }
 
     async function updatePurchaseRequisitionItems(prId, releaseCode) {
