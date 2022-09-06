@@ -187,7 +187,7 @@ module.exports = cds.service.impl(async function () {
             method: 'GET',
             headers: {
                 'accept': 'application/json',
-                'Authorization': 'User +/pss2/sKW+/gylfU9uJT6z2RS7OZX5D2If4ybRKRD0=, Organization 1e433c34db6484da4a5d4963357ccc35, Element 1kqtR353PM6PY1oXm/dyLsvihhq7sfvPo1sLMiqI1U0='
+                'Authorization': process.env.authorization
             }
 
         };
@@ -342,7 +342,7 @@ module.exports = cds.service.impl(async function () {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
-                'Authorization': 'User +/pss2/sKW+/gylfU9uJT6z2RS7OZX5D2If4ybRKRD0=, Organization 1e433c34db6484da4a5d4963357ccc35, Element 1kqtR353PM6PY1oXm/dyLsvihhq7sfvPo1sLMiqI1U0=',
+                'Authorization': process.env.authorization,
                 'Content-Type': 'application/json'
             }
 
@@ -382,7 +382,7 @@ module.exports = cds.service.impl(async function () {
             method: 'PATCH',
             headers: {
                 'accept': 'application/json',
-                'Authorization': 'User +/pss2/sKW+/gylfU9uJT6z2RS7OZX5D2If4ybRKRD0=, Organization 1e433c34db6484da4a5d4963357ccc35, Element 1kqtR353PM6PY1oXm/dyLsvihhq7sfvPo1sLMiqI1U0=',
+                'Authorization': process.env.authorization,
                 'Content-Type': 'application/json'
             }
 
