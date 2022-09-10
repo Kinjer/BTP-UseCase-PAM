@@ -15,6 +15,8 @@ module.exports = cds.service.impl(async function () {
     // connect to remote service
     const BPsrv = await cds.connect.to("API_PURCHASEREQ_PROCESS_SRV");
 
+    const db = await cds.connect.to('db');
+
     /**
      * Event-handler for read-events on the PurchaseRequisitions entity.
      * Each request to the API Business Hub requires the apikey in the header.
@@ -35,7 +37,7 @@ module.exports = cds.service.impl(async function () {
     //     // sendMail();
     //     // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
 
-    //     // updatePurchaseRequisitionItems('10000011', 'B');
+    //     // updatePurchaseRequisitionItems('10000000', 'B', db.tx());
     //     // updateRemoteServiceData('10000011', '10', 'B');
     // });
 
@@ -56,14 +58,14 @@ module.exports = cds.service.impl(async function () {
         // start job
         let job = schedule.scheduleJob(rule, () => {
             index = index + 1;
-            console.log("---------------------" + index);
+            console.log("scheduleJobGetPr---------------------" + index);
             console.log(new Date());
             console.log("---------------------");
 
             insertRemoteServiceData(index);
-            sendMail();
+            // sendMail();
 
-            if (index == 3) {
+            if (index == 5) {
                 job.cancel();
             }
         });
@@ -85,13 +87,13 @@ module.exports = cds.service.impl(async function () {
         // start job
         let job = schedule.scheduleJob(rule, () => {
             index = index + 1;
-            console.log("---------------------" + index);
+            console.log("scheduleJobUpdatePr---------------------" + index);
             console.log(new Date());
             console.log("---------------------");
 
             getMails();
 
-            if (index == 3) {
+            if (index == 5) {
                 job.cancel();
             }
         });
@@ -110,13 +112,16 @@ module.exports = cds.service.impl(async function () {
 
         if (prs) {
             await cds.run(INSERT.into(PurchaseRequisitionItems, prs));
+            console.log("INSERT complete");
         }
+
+        sendMail();
     }
 
     async function updateRemoteServiceData(prId, prItem, releaseCode) {
+        let tx = BPsrv.tx();
         try {
-            
-            var result = await BPsrv.send({
+            var result = await tx.send({
                 query: UPDATE(PurchaseRequisitions).set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId} and PurchaseRequisitionItem=${prItem}`,
                 headers: {
                     apikey: process.env.apikey,
@@ -126,6 +131,7 @@ module.exports = cds.service.impl(async function () {
         } catch (error) {
             console.log("error message ==> " + error);
             console.log(error.code);
+            console.log("Update Remote Service Data "+prId+", "+prItem+", "+releaseCode);
             // console.log("=======================================");
             // console.log(error);
         }
@@ -147,6 +153,7 @@ module.exports = cds.service.impl(async function () {
         }
 
         html = html + "</div></body></html>";
+        console.log(html);
         return html;
 
     }
@@ -232,14 +239,16 @@ module.exports = cds.service.impl(async function () {
         str = str.replace(" ", "").replace("，", ",");
         var strList = str.split(",");
 
+        let tx = db.tx();
+
         prIdList.forEach(function (prId) {
 
             if (str === "approveall") {
-                updatePurchaseRequisitionItems(prId, "B");
-                console.log(prId + "update all B");
+                updatePurchaseRequisitionItems(prId, "B", tx);
+                console.log(prId + " update all B");
             } else if (str === "rejectall") {
-                updatePurchaseRequisitionItems(prId, "C");
-                console.log(prId + "update all C");
+                updatePurchaseRequisitionItems(prId, "C", tx);
+                console.log(prId + " update all C");
             } else {
                 strList.forEach(function (item) {
                     var index = item.indexOf(prId);
@@ -248,17 +257,20 @@ module.exports = cds.service.impl(async function () {
                         result = item.replace(prId + "-", "");
                         console.log(result);
                         if (result === "approve") {
-                            updatePurchaseRequisitionItems(prId, "B");
-                            console.log(prId + "update B");
+                            updatePurchaseRequisitionItems(prId, "B", tx);
+                            console.log(prId + " update B");
                         }
                         if (result === "reject") {
-                            updatePurchaseRequisitionItems(prId, "C");
-                            console.log(prId + "update C");
+                            updatePurchaseRequisitionItems(prId, "C", tx);
+                            console.log(prId + " update C");
                         }
                     }
                 });
             }
         });
+
+        tx.commit();
+        console.log("commit ok");
 
     }
 
@@ -267,7 +279,13 @@ module.exports = cds.service.impl(async function () {
         var dom = new JSDOM(html).window.document;
 
         // Find the corresponding object through the document operation 
-        var nodeList = dom.getElementsByName("prId");
+        var nodeList = [];
+        nodeList = dom.getElementsByName("prId");
+
+        if (nodeList.length === 0) {
+            
+            nodeList = dom.getElementsByName("x_prId");
+        }
 
         var prIdList = [];
         nodeList.forEach(function (element) {
@@ -287,22 +305,32 @@ module.exports = cds.service.impl(async function () {
         return await cds.run(query);
     }
 
-    async function updatePurchaseRequisitionItems(prId, releaseCode) {
-        console.log("update" + prId + ":" + releaseCode);
+    async function updatePurchaseRequisitionItems(prId, releaseCode, tx) {
+        console.log("-----------update" + prId + ":" + releaseCode);
+        
+        // await cds.run(UPDATE(PurchaseRequisitionItems).set('ReleaseCode=', releaseCode).where('PurchaseRequisition=', prId));
+        await tx.run(UPDATE(PurchaseRequisitionItems).set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId}`);
+        // await tx.commit();
+        console.log(prId + "-----------update ok----------------");
 
-        await cds.run(UPDATE(PurchaseRequisitionItems).set('ReleaseCode=', releaseCode).where('PurchaseRequisition=', prId));
+        var prItemObj = await getPrItem(prId);
+        console.log(prItemObj);
+        var prItem = prItemObj[0].PurchaseRequisitionItem;
+        console.log(prItem);
 
-        updateRemoteServiceData(prId, getPrItem(prId), releaseCode);
+        await updateRemoteServiceData(prId, prItem, releaseCode);
 
     }
 
 
-    function sendMail() {
+    async function sendMail() {
         var currentDate = date.format(new Date(), 'YYYYMMDD');
+
+        var htmlStr = await getMailContent();
 
         var post_data = {
             "Body": {
-                "Content": getMailContent(),
+                "Content": htmlStr,
                 "ContentType": "HTML"
             },
             "From": {
