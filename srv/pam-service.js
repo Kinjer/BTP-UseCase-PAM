@@ -32,17 +32,17 @@ module.exports = cds.service.impl(async function () {
         return prs;
     });
 
-    // this.on("READ", PurchaseRequisitionItems, async (req) => {
-    //     // getMails();
-    //     // sendMail();
-    //     // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
+    this.on("READ", PurchaseRequisitionItems, async (req) => {
+        getMails();
+        // sendMail();
+        // updateMail('AQMkADAwATM0MDAAMS00ODkwLTk2YzktMDACLTAwCgBGAAADRhD4NPFCOkGa5OLjSN_QtwcABkfSyFcE9UmKllR9a79jigAAAgEMAAAABkfSyFcE9UmKllR9a79jigAAABVZ1WAAAAA=');
 
-    //     // updatePurchaseRequisitionItems('10000000', 'B', db.tx());
-    //     // updateRemoteServiceData('10000011', '10', 'B');
-    // });
+        // updatePurchaseRequisitionItems('10000000', 'B', db.tx());
+        // updateRemoteServiceData('10000011', '10', 'B');
+    });
 
-    scheduleJobGetPr();
-    scheduleJobUpdatePr();
+    // scheduleJobGetPr();
+    // scheduleJobUpdatePr();
 
     function scheduleJobGetPr() {
 
@@ -65,7 +65,7 @@ module.exports = cds.service.impl(async function () {
             insertRemoteServiceData(index);
             // sendMail();
 
-            if (index == 5) {
+            if (index == 4) {
                 job.cancel();
             }
         });
@@ -93,7 +93,7 @@ module.exports = cds.service.impl(async function () {
 
             getMails();
 
-            if (index == 5) {
+            if (index == 6) {
                 job.cancel();
             }
         });
@@ -171,17 +171,17 @@ module.exports = cds.service.impl(async function () {
         var creationDate = item.CreationDate;
         var deliveryDate = item.DeliveryDate;
 
-        var result = "<div>Purchase Requisition Id:<span name=\"prId\">" + purchaseRequisition
-            + "</span></div><div>Purchase Order Id:<span>" + purchasingDocument
-            + "</span></div><div>Short Text:<span>" + text
-            + "</span></div><div>Material:<span>" + material
-            + "</span></div><div>Quantity requested:<span>" + requestedQuantity
-            + "</span></div><div>Valuation Price:<span>" + price
-            + "</span></div><div>Company Code:<span>" + companyCode
-            + "</span></div><div>Desired Supplier:<span>" + supplier
-            + "</span></div><div>Requisition Date:<span>" + creationDate
-            + "</span></div><div>Delivery Date:<span>" + deliveryDate
-            + "</span></div><div>--------------------------------------------------------------</div>";
+        var result = "<div>Purchase Requisition Id:" + purchaseRequisition
+            + "</div><div>Purchase Order Id:" + purchasingDocument
+            + "</div><div>Short Text:" + text
+            + "</div><div>Material:" + material
+            + "</div><div>Quantity requested:" + requestedQuantity
+            + "</div><div>Valuation Price:" + price
+            + "</div><div>Company Code:" + companyCode
+            + "</div><div>Desired Supplier:" + supplier
+            + "</div><div>Requisition Date:" + creationDate
+            + "</div><div>Delivery Date:" + deliveryDate
+            + "</div><div>--------------------------------------------------------------</div>";
 
         return result;
     }
@@ -239,15 +239,15 @@ module.exports = cds.service.impl(async function () {
         str = str.replace(" ", "").replace("，", ",");
         var strList = str.split(",");
 
-        let tx = db.tx();
+        // let tx = db.tx();
 
         prIdList.forEach(function (prId) {
 
             if (str === "approveall") {
-                updatePurchaseRequisitionItems(prId, "B", tx);
+                updatePurchaseRequisitionItems(prId, "B");
                 console.log(prId + " update all B");
             } else if (str === "rejectall") {
-                updatePurchaseRequisitionItems(prId, "C", tx);
+                updatePurchaseRequisitionItems(prId, "C");
                 console.log(prId + " update all C");
             } else {
                 strList.forEach(function (item) {
@@ -257,11 +257,11 @@ module.exports = cds.service.impl(async function () {
                         result = item.replace(prId + "-", "");
                         console.log(result);
                         if (result === "approve") {
-                            updatePurchaseRequisitionItems(prId, "B", tx);
+                            updatePurchaseRequisitionItems(prId, "B");
                             console.log(prId + " update B");
                         }
                         if (result === "reject") {
-                            updatePurchaseRequisitionItems(prId, "C", tx);
+                            updatePurchaseRequisitionItems(prId, "C");
                             console.log(prId + " update C");
                         }
                     }
@@ -269,28 +269,18 @@ module.exports = cds.service.impl(async function () {
             }
         });
 
-        tx.commit();
-        console.log("commit ok");
+        // tx.commit();
+        // console.log("commit ok");
 
     }
 
     function parseHtml(html) {
-        // Get Document Object
-        var dom = new JSDOM(html).window.document;
-
-        // Find the corresponding object through the document operation 
-        var nodeList = [];
-        nodeList = dom.getElementsByName("prId");
-
-        if (nodeList.length === 0) {
-            
-            nodeList = dom.getElementsByName("x_prId");
-        }
+        var results = html.match(/Purchase Requisition Id:(.*?)<\//g);
 
         var prIdList = [];
-        nodeList.forEach(function (element) {
+        results.forEach(function (element) {
 
-            var prId = element.textContent;
+            var prId = element.replace("Purchase Requisition Id:", "").replace("</", "");
             console.log(prId);
             prIdList.push(prId);
         });
@@ -300,25 +290,33 @@ module.exports = cds.service.impl(async function () {
     }
 
     async function getPrItem(prId) {
+        var tx = db.tx();
         var query = SELECT.from(PurchaseRequisitionItems).columns('PurchaseRequisitionItem').where("PurchaseRequisition=", prId);
 
-        return await cds.run(query);
+        var res = await tx.run(query);
+        await tx.commit();
+        return res;
+
     }
 
-    async function updatePurchaseRequisitionItems(prId, releaseCode, tx) {
-        console.log("-----------update" + prId + ":" + releaseCode);
-        
-        // await cds.run(UPDATE(PurchaseRequisitionItems).set('ReleaseCode=', releaseCode).where('PurchaseRequisition=', prId));
-        await tx.run(UPDATE(PurchaseRequisitionItems).set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId}`);
-        // await tx.commit();
-        console.log(prId + "-----------update ok----------------");
-
+    async function updatePurchaseRequisitionItems(prId, releaseCode) {
         var prItemObj = await getPrItem(prId);
         console.log(prItemObj);
-        var prItem = prItemObj[0].PurchaseRequisitionItem;
-        console.log(prItem);
-
-        await updateRemoteServiceData(prId, prItem, releaseCode);
+        if (prItemObj && prItemObj.length > 0) {
+            
+            var prItem = prItemObj[0].PurchaseRequisitionItem;
+            console.log(prItem);
+    
+            console.log("-----------update" + prId + ":" + releaseCode);
+            
+            var tx = db.tx();
+            // await cds.run(UPDATE(PurchaseRequisitionItems).set('ReleaseCode=', releaseCode).where('PurchaseRequisition=', prId));
+            await tx.run(UPDATE(PurchaseRequisitionItems).set `ReleaseCode=${releaseCode}` .where `PurchaseRequisition=${prId}`);
+            await tx.commit();
+            console.log(prId + "-----------update ok----------------");
+    
+            await updateRemoteServiceData(prId, prItem, releaseCode);
+        }
 
     }
 

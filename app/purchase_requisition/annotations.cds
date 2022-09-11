@@ -25,22 +25,32 @@ annotate service.PurchaseRequisitionItems with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : PurchaseRequisitionItem,
-            ![@HTML5.CssDefaults] : {width : '100%'}
-        },
-        {
-            $Type : 'UI.DataField',
             Value : PurchasingDocument,
             ![@HTML5.CssDefaults] : {width : '100%'}
         },
         {
             $Type : 'UI.DataField',
-            Value : PurchasingDocumentItem,
+            Value : PurchaseRequisitionItemText,
             ![@HTML5.CssDefaults] : {width : '100%'}
         },
         {
             $Type : 'UI.DataField',
-            Value : PurReqnReleaseStatus,
+            Value : Material,
+            ![@HTML5.CssDefaults] : {width : '100%'}
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : RequestedQuantity,
+            ![@HTML5.CssDefaults] : {width : '100%'}
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : PurchaseRequisitionPrice,
+            ![@HTML5.CssDefaults] : {width : '100%'}
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : ReleaseCode,
             ![@HTML5.CssDefaults] : {width : '100%'}
         },
     ]
